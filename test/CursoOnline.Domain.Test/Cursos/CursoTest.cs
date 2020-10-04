@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using CursoOnline.Domain.Cursos;
 using CursoOnline.Domain.Test._Builders;
 using CursoOnline.Domain.Test._Util;
 using ExpectedObjects;
@@ -86,41 +87,6 @@ namespace CursoOnline.Domain.Test.Cursos
         public void Dispose()
         {
             _outPut.WriteLine("Cleanup");
-        }
-    }
-
-    public enum PublicoAlvo
-    {
-        Estudante,
-        Universitario,
-        Empregado,
-        Empreendedor
-    }
-
-    public class Curso
-    {
-        public string Nome { get; private set; }
-        public string Descricao { get; }
-        public double CargaHoraria { get; private set; }
-        public PublicoAlvo PublicoAlvo { get; private set; }
-        public double Valor { get; private set; }
-
-        public Curso(string nome, string descricao, double cargaHoraria, PublicoAlvo publicoAlvo, double valor)
-        {
-            if (string.IsNullOrEmpty(nome))
-                throw new ArgumentException("Nome inválido");
-
-            if (cargaHoraria < 1)
-                throw new ArgumentException("Carga horária inválida");
-
-            if (valor < 1)
-                throw new ArgumentException("Valor inválido");
-
-            Nome = nome;
-            Descricao = descricao;
-            CargaHoraria = cargaHoraria;
-            PublicoAlvo = publicoAlvo;
-            Valor = valor;
         }
     }
 }
