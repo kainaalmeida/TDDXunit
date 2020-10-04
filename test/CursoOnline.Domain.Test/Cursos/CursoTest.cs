@@ -1,4 +1,5 @@
-﻿using CursoOnline.Domain.Test._Builders;
+﻿using Bogus;
+using CursoOnline.Domain.Test._Builders;
 using CursoOnline.Domain.Test._Util;
 using ExpectedObjects;
 using System;
@@ -22,11 +23,13 @@ namespace CursoOnline.Domain.Test.Cursos
             _outPut = outPut;
             _outPut.WriteLine("teste sendo executado");
 
-            _nome = "Informática básica";
-            _cargaHoraria = 80;
+            var faker = new Faker();
+
+            _nome = faker.Random.Word();
+            _cargaHoraria = faker.Random.Double(500,1000);
             _publicoAlvo = PublicoAlvo.Estudante;
-            _valor = 950;
-            _descricao = "Uma descrição";
+            _valor = faker.Random.Double(100,1000);
+            _descricao = faker.Lorem.Paragraph();
 
         }
 
