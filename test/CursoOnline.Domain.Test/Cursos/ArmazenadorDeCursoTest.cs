@@ -1,6 +1,9 @@
 ﻿using Bogus;
 using CursoOnline.Domain.Cursos;
+using CursoOnline.Domain.Test._Builders;
+using CursoOnline.Domain.Test._Util;
 using Moq;
+using System;
 using Xunit;
 
 namespace CursoOnline.Domain.Test.Cursos
@@ -20,7 +23,7 @@ namespace CursoOnline.Domain.Test.Cursos
                 Nome = faker.Random.Words(),
                 Descricao = faker.Lorem.Paragraph(),
                 CargaHoraria = faker.Random.Double(500, 1000),
-                PublicoAlvoId = 1,
+                PublicoAlvo = "Estudante",
                 Valor = faker.Random.Double(100, 1000)
             };
 
@@ -35,36 +38,24 @@ namespace CursoOnline.Domain.Test.Cursos
 
             _cursoRepositorioMock.Verify(r => r.Adicionar(It.Is<Curso>(c => c.Nome == _cursoDto.Nome)));
         }
-    }
 
-    public interface ICursoRepositorio
-    {
-        void Adicionar(Curso curso);
-    }
-
-    public class ArmazenadorDeCurso
-    {
-        private ICursoRepositorio _cursoRepositorio;
-
-        public ArmazenadorDeCurso(ICursoRepositorio cursoRepositorio)
+        [Fact]
+        public void NaoDeveAdicionarCursoComMesmoNomeDeOutroJaSalvo()
         {
-            _cursoRepositorio = cursoRepositorio;
+            var cursoJaSalvo = CursoBuilder.Novo().ComNome(_cursoDto.Nome).Build();
+            _cursoRepositorioMock.Setup(r => r.ObterPeloNome(_cursoDto.Nome)).Returns(cursoJaSalvo);
+
+            Assert.Throws<ArgumentException>(() => _armazenadorDeCurso.Armazenar(_cursoDto))
+                .ComMensagem("Nome do curso já consta no banco de dados");
         }
 
-        public void Armazenar(CursoDto cursoDto)
+        [Fact]
+        public void NaoDeveAdicionarPublicoAlvoInvalido()
         {
-            var curso = new Curso(cursoDto.Nome, cursoDto.Descricao, cursoDto.CargaHoraria, PublicoAlvo.Estudante, cursoDto.Valor);
+            _cursoDto.PublicoAlvo = "Medico";
 
-            _cursoRepositorio.Adicionar(curso);
+            Assert.Throws<ArgumentException>(() => _armazenadorDeCurso.Armazenar(_cursoDto))
+                .ComMensagem("Publico Alvo inválido");
         }
-    }
-
-    public class CursoDto
-    {
-        public string Nome { get; set; }
-        public string Descricao { get; set; }
-        public double CargaHoraria { get; set; }
-        public int PublicoAlvoId { get; set; }
-        public double Valor { get; set; }
     }
 }
